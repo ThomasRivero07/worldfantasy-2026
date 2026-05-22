@@ -1,4 +1,4 @@
-# WorldFantasy 2026 ⚽
+# WorldFantasy 2026 
 
 Fantasy league del Mundial FIFA 2026 con predicciones ML y ligas privadas en tiempo real.
 
