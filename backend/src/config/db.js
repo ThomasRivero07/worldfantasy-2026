@@ -17,10 +17,10 @@ export const connectPostgres = async () => {
   try {
     await sequelize.authenticate();
     await sequelize.sync({ alter: true });
-    console.log('✅ PostgreSQL connected');
+    console.log(' PostgreSQL connected');
   } catch (err) {
-    console.error('❌ PostgreSQL error:', err.message);
-    console.error('❌ Full error:', err);
+    console.error(' PostgreSQL error:', err.message);
+    console.error(' Full error:', err);
     process.exit(1);
   }
 };

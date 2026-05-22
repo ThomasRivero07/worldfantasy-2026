@@ -1,14 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --green:     #00D26A;
-  --green-dim: #00A854;
-  --dark:      #0A0F1E;
-  --dark-2:    #111827;
-  --dark-3:    #1F2937;
-  --gold:      #F5C842;
-  --white:     #F9FAFB;
-  --gray:      #6B7280;
+  /* Paleta oficial Mundial 2026 */
+  --gold:      #C9A84C;   /* dorado trofeo */
+  --gold-dim:  #A8893A;
+  --red:       #E61D25;   /* rojo USA/Canada */
+  --blue:      #2A398D;   /* azul USA/Mexico */
+  --green:     #3CAC3B;   /* verde Mexico */
+  --dark:      #0A0A0F;   /* fondo principal */
+  --dark-2:    #111118;   /* cards */
+  --dark-3:    #1A1A24;   /* hover */
+  --border:    #2A2A38;
+  --white:     #F4F4F6;
+  --gray:      #6B6B7E;
+  --gray-dim:  #3A3A4E;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

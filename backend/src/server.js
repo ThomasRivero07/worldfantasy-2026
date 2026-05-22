@@ -42,5 +42,5 @@ app.use(errorHandler);
 
 connectPostgres().then(() => {
   const PORT = process.env.PORT || 3001;
-  httpServer.listen(PORT, () => console.log(`🚀 Server on ${PORT}`));
-}).catch(err => console.error('❌', err.message));
+  httpServer.listen(PORT, () => console.log(` Server on ${PORT}`));
+}).catch(err => console.error('', err.message));

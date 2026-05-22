@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 
+const G = '#C9A84C';
+const R = '#E61D25';
+
 export default function AuthForm({ mode }) {
   const isLogin = mode === 'login';
   const { login, register } = useAuth();
@@ -18,39 +21,37 @@ export default function AuthForm({ mode }) {
     setError('');
     setLoading(true);
     try {
-      if (isLogin) {
-        await login(form.email, form.password);
-      } else {
-        await register(form.username, form.email, form.password);
-      }
+      if (isLogin) await login(form.email, form.password);
+      else await register(form.username, form.email, form.password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Ocurrió un error, intentá de nuevo');
-    } finally {
-      setLoading(false);
-    }
+      setError(err.response?.data?.error || 'Ocurrio un error, intenta de nuevo');
+    } finally { setLoading(false); }
   };
 
-  const input = { width: '100%', background: '#111827', border: '1px solid #374151', borderRadius: '8px', padding: '0.75rem 1rem', color: '#F9FAFB', fontSize: '0.95rem', outline: 'none' };
-  const label = { fontSize: '0.85rem', color: '#9CA3AF', marginBottom: '6px', display: 'block' };
+  const input = { width: '100%', background: '#111118', border: '1px solid #2A2A38', borderRadius: '8px', padding: '0.75rem 1rem', color: '#F4F4F6', fontSize: '0.95rem', outline: 'none' };
+  const label = { fontSize: '0.85rem', color: '#6B6B7E', marginBottom: '6px', display: 'block' };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+    <div style={{ minHeight: '100vh', background: '#0A0A0F', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      {/* Barra tricolor */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '3px', background: `linear-gradient(to right, ${R} 33%, ${G} 33%, ${G} 66%, #3CAC3B 66%)` }} />
+
       <div style={{ width: '100%', maxWidth: '420px' }}>
-        {/* Logo */}
         <Link to="/" style={{ display: 'block', textAlign: 'center', marginBottom: '2rem' }}>
-          <span style={{ fontFamily: 'Bebas Neue', fontSize: '2rem', color: 'var(--green)', letterSpacing: '0.1em' }}>
-            WORLD<span style={{ color: 'var(--white)' }}>FANTASY</span>
-            <span style={{ color: 'var(--gold)', marginLeft: '6px' }}>2026</span>
+          <span style={{ fontFamily: 'Bebas Neue', fontSize: '2rem', letterSpacing: '0.1em' }}>
+            <span style={{ color: G }}>WORLD</span>
+            <span style={{ color: '#F4F4F6' }}>FANTASY</span>
+            <span style={{ color: R, marginLeft: '6px' }}>2026</span>
           </span>
         </Link>
 
-        <div style={{ background: 'var(--dark-2)', border: '1px solid #1F2937', borderRadius: '16px', padding: '2rem' }}>
+        <div style={{ background: '#111118', border: '1px solid #2A2A38', borderRadius: '16px', padding: '2rem', borderTop: `3px solid ${G}` }}>
           <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '1.8rem', marginBottom: '0.25rem' }}>
             {isLogin ? 'Bienvenido de vuelta' : 'Crear cuenta'}
           </h2>
-          <p style={{ color: 'var(--gray)', fontSize: '0.875rem', marginBottom: '1.75rem' }}>
-            {isLogin ? 'Ingresá a tu equipo fantasy' : 'Unite al Mundial más épico de la historia'}
+          <p style={{ color: '#6B6B7E', fontSize: '0.875rem', marginBottom: '1.75rem' }}>
+            {isLogin ? 'Ingresa a tu equipo fantasy' : 'Unite al Mundial mas epico de la historia'}
           </p>
 
           {error && (
@@ -71,23 +72,19 @@ export default function AuthForm({ mode }) {
               <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="tu@email.com" required style={input} />
             </div>
             <div>
-              <label style={label}>Contraseña</label>
-              <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="mínimo 6 caracteres" required style={input} />
+              <label style={label}>Contrasena</label>
+              <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="minimo 6 caracteres" required style={input} />
             </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              style={{ marginTop: '0.5rem', padding: '0.85rem', background: loading ? '#065F46' : 'var(--green)', border: 'none', borderRadius: '8px', color: '#000', fontWeight: 700, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}
-            >
-              {loading ? 'Cargando...' : isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
+            <button type="submit" disabled={loading}
+              style={{ marginTop: '0.5rem', padding: '0.85rem', background: loading ? '#A8893A' : G, border: 'none', borderRadius: '8px', color: '#000', fontWeight: 700, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer' }}>
+              {loading ? 'Cargando...' : isLogin ? 'Iniciar sesion' : 'Crear cuenta'}
             </button>
           </form>
 
-          <p style={{ textAlign: 'center', marginTop: '1.5rem', color: 'var(--gray)', fontSize: '0.875rem' }}>
-            {isLogin ? '¿No tenés cuenta? ' : '¿Ya tenés cuenta? '}
-            <Link to={isLogin ? '/register' : '/login'} style={{ color: 'var(--green)', fontWeight: 500 }}>
-              {isLogin ? 'Registrate gratis' : 'Iniciá sesión'}
+          <p style={{ textAlign: 'center', marginTop: '1.5rem', color: '#6B6B7E', fontSize: '0.875rem' }}>
+            {isLogin ? 'No tenes cuenta? ' : 'Ya tenes cuenta? '}
+            <Link to={isLogin ? '/register' : '/login'} style={{ color: G, fontWeight: 500 }}>
+              {isLogin ? 'Registrate gratis' : 'Inicia sesion'}
             </Link>
           </p>
         </div>
