@@ -3,18 +3,100 @@ dotenv.config();
 import { connectPostgres } from '../config/db.js';
 import Player from '../models/Player.model.js';
 
-const assignPrices = (players, position) => {
-  const basePrices = {
-    Goalkeeper: [9.0, 6.5, 5.5],
-    Defender:   [9.5, 8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5, 5.5, 5.5, 5.5, 5.5],
-    Midfielder: [12.0, 10.5, 9.5, 9.0, 8.5, 8.0, 7.5, 7.0, 6.5, 6.5, 6.5],
-    Attacker:   [15.0, 13.0, 11.0, 10.0, 9.0, 8.5, 8.0, 7.5, 7.0, 6.5],
-  };
-  return players.map((name, i) => ({
-    name,
-    position,
-    fantasy_price: basePrices[position][Math.min(i, basePrices[position].length - 1)]
-  }));
+// Factor de calidad por seleccion (multiplica los precios base)
+const TEAM_FACTOR = {
+  // Favoritos absolutos
+  'Argentina': 1.0, 'Brasil': 1.0, 'Francia': 1.0, 'Inglaterra': 0.95,
+  'España': 0.95, 'Alemania': 0.90, 'Portugal': 0.90,
+  // Fuertes
+  'Países Bajos': 0.85, 'Bélgica': 0.82, 'Uruguay': 0.80,
+  'Noruega': 0.80, 'Croacia': 0.78, 'Suiza': 0.75,
+  'Colombia': 0.78, 'Marruecos': 0.75, 'Senegal': 0.75,
+  'Japón': 0.72, 'Corea del Sur': 0.72, 'México': 0.72,
+  'Suecia': 0.70, 'Austria': 0.70, 'Turquía': 0.70,
+  'Ecuador': 0.68, 'Estados Unidos': 0.68, 'Canadá': 0.68,
+  // Medios
+  'Dinamarca': 0.65, 'Egipto': 0.65, 'Ghana': 0.65,
+  'Argelia': 0.63, 'Costa de Marfil': 0.65, 'Túnez': 0.62,
+  'Paraguay': 0.62, 'Australia': 0.62, 'Bosnia y Herzegovina': 0.60,
+  'República Checa': 0.62, 'Escocia': 0.60, 'Irán': 0.58,
+  'Arabia Saudita': 0.55, 'Qatar': 0.52, 'RD Congo': 0.60,
+  // Menores
+  'Uzbekistán': 0.50, 'Nueva Zelanda': 0.48, 'Cabo Verde': 0.50,
+  'Jordania': 0.45, 'Haití': 0.45, 'Panamá': 0.48,
+  'Curazao': 0.45, 'Sudáfrica': 0.55, 'Irak': 0.42,
+};
+
+// Precios base por posicion y ranking dentro del equipo
+// El precio se multiplica por el TEAM_FACTOR del equipo
+const BASE_PRICES = {
+  Goalkeeper: [9.5, 6.0, 5.0],
+  Defender:   [10.0, 8.5, 7.5, 7.0, 6.5, 6.0, 5.5, 5.0, 5.0, 5.0, 5.0, 5.0],
+  Midfielder: [13.0, 11.0, 9.5, 8.5, 7.5, 7.0, 6.5, 6.0, 5.5, 5.5, 5.5],
+  Attacker:   [15.0, 13.0, 11.0, 9.5, 8.5, 7.5, 7.0, 6.5, 6.0, 5.5],
+};
+
+// Overrides manuales para jugadores especiales (precio fijo)
+const PRICE_OVERRIDES = {
+  'Lionel Messi': 15.0,
+  'Kylian Mbappe': 15.0,
+  'Erling Haaland': 15.0,
+  'Vinicius Junior': 14.5,
+  'Mohamed Salah': 14.0,
+  'Jude Bellingham': 14.0,
+  'Harry Kane': 13.5,
+  'Son Heung-min': 13.0,
+  'Jonathan David': 12.5,
+  'Lautaro Martínez': 12.5,
+  'Julián Álvarez': 12.0,
+  'Darwin Núñez': 12.0,
+  'Rodri': 12.0,
+  'Pedri': 12.0,
+  'Martin Odegaard': 12.0,
+  'Viktor Gyokeres': 12.0,
+  'Alexander Isak': 11.5,
+  'Alphonso Davies': 13.0,
+  'Achraf Hakimi': 12.0,
+  'Neymar Junior': 11.0,
+  'Raphinha': 11.0,
+  'Cristiano Ronaldo': 11.0,
+  'Bruno Fernandes': 11.0,
+  'Rúben Dias': 10.0,
+  'Virgil van Dijk': 10.0,
+  'Romelu Lukaku': 10.5,
+  'Cody Gakpo': 11.0,
+  'Kevin De Bruyne': 13.0,
+  'Florian Wirtz': 13.0,
+  'Jamal Musiala': 13.0,
+  'Luis Díaz': 12.0,
+  'Federico Valverde': 12.0,
+  'Frenkie de Jong': 10.5,
+  'Tijjani Reijnders': 9.5,
+  'Brahim Diaz': 9.5,
+  'Sadio Mané': 11.5,
+  'Takefusa Kubo': 10.0,
+  'Christian Pulisic': 11.5,
+  'Dejan Kulusevski': 10.0,
+  'Thomas Partey': 9.0,
+  'Mohammed Kudus': 10.5,
+  'Inaki Williams': 9.0,
+  'Riyad Mahrez': 9.5,
+  'Mehdi Taremi': 9.5,
+  'Santiago Giménez': 10.5,
+  'Raúl Jiménez': 8.5,
+  'Chucky Lozano': 9.5,
+};
+
+const assignPrices = (players, position, teamFactor) => {
+  const prices = BASE_PRICES[position];
+  return players.map((name, i) => {
+    if (PRICE_OVERRIDES[name]) return { name, position, fantasy_price: PRICE_OVERRIDES[name] };
+    const base = prices[Math.min(i, prices.length - 1)];
+    const price = Math.max(1.0, Math.min(15.0, parseFloat((base * teamFactor).toFixed(1))));
+    // Redondear al 0.5 más cercano
+    const rounded = Math.round(price * 2) / 2;
+    return { name, position, fantasy_price: rounded };
+  });
 };
 
 const squads = {
@@ -363,11 +445,12 @@ const seed = async () => {
 
   let total = 0;
   for (const [teamName, squad] of Object.entries(squads)) {
+    const factor = TEAM_FACTOR[teamName] ?? 0.5;
     const players = [
-      ...assignPrices(squad.gk, 'Goalkeeper'),
-      ...assignPrices(squad.df, 'Defender'),
-      ...assignPrices(squad.mf, 'Midfielder'),
-      ...assignPrices(squad.at, 'Attacker'),
+      ...assignPrices(squad.gk, 'Goalkeeper', factor),
+      ...assignPrices(squad.df, 'Defender', factor),
+      ...assignPrices(squad.mf, 'Midfielder', factor),
+      ...assignPrices(squad.at, 'Attacker', factor),
     ];
 
     for (const [i, p] of players.entries()) {
@@ -387,6 +470,7 @@ const seed = async () => {
   }
 
   console.log(`\n\n Total: ${total} jugadores de ${Object.keys(squads).length} selecciones`);
+  console.log('Precios van de 1.0M (reservas de selecciones menores) a 15.0M (Messi, Mbappe, Haaland)');
   process.exit(0);
 };
 
