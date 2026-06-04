@@ -1,77 +1,82 @@
 import { Link } from 'react-router-dom';
 
-const G = '#C9A84C';  // gold
-const R = '#E61D25';  // red
-const B = '#2A398D';  // blue
-const GR = '#3CAC3B'; // green
+const G = '#C9A84C';
+const R = '#E61D25';
+const B = '#2A5298';
+const GR = '#3CAC3B';
 
 export default function Landing() {
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0A0F', display: 'flex', flexDirection: 'column' }}>
-      {/* Barra tricolor top */}
+    <div style={{ minHeight: '100vh', background: '#000', display: 'flex', flexDirection: 'column' }}>
       <div style={{ height: '3px', background: `linear-gradient(to right, ${R} 33%, ${G} 33%, ${G} 66%, ${GR} 66%)` }} />
 
       {/* NAV */}
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 2rem', borderBottom: '1px solid #2A2A38' }}>
-        <span style={{ fontFamily: 'Bebas Neue', fontSize: '1.6rem', letterSpacing: '0.1em' }}>
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.25rem 2.5rem', borderBottom: '1px solid #1E1E1E' }}>
+        <span style={{ fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '1.75rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
           <span style={{ color: G }}>WORLD</span>
-          <span style={{ color: '#F4F4F6' }}>FANTASY</span>
-          <span style={{ color: R, marginLeft: '6px' }}>2026</span>
+          <span style={{ color: '#F0F0F0' }}>FANTASY</span>
+          <span style={{ color: R, marginLeft: '8px' }}>2026</span>
         </span>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <Link to="/login" style={{ padding: '0.5rem 1.25rem', border: '1px solid #2A2A38', borderRadius: '8px', color: '#F4F4F6', fontSize: '0.9rem' }}>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <Link to="/login" className="btn-outline"
+            style={{ padding: '0.5rem 1.25rem', border: '1px solid #2A2A2A', borderRadius: '6px', color: '#F0F0F0', fontSize: '0.875rem', fontFamily: 'Barlow Condensed', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', display: 'inline-block' }}>
             Iniciar sesion
           </Link>
-          <Link to="/register" style={{ padding: '0.5rem 1.25rem', background: G, borderRadius: '8px', color: '#000', fontSize: '0.9rem', fontWeight: 700 }}>
+          <Link to="/register" className="btn-primary"
+            style={{ padding: '0.5rem 1.25rem', background: G, borderRadius: '6px', color: '#000', fontSize: '0.875rem', fontFamily: 'Barlow Condensed', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase', display: 'inline-block' }}>
             Jugar gratis
           </Link>
         </div>
       </nav>
 
       {/* HERO */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
-        <div style={{ background: R, color: '#fff', fontSize: '0.75rem', fontWeight: 700, padding: '4px 14px', borderRadius: '999px', marginBottom: '1.5rem', letterSpacing: '0.12em' }}>
-          MUNDIAL FIFA 2026 · JUNIO - JULIO
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '5rem 2rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 50% 0%, ${B}18 0%, transparent 65%)`, pointerEvents: 'none' }} />
+
+        <div className="fade-in" style={{ background: R, color: '#fff', fontSize: '0.72rem', fontFamily: 'Barlow Condensed', fontWeight: 700, padding: '4px 16px', borderRadius: '3px', marginBottom: '1.5rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+          Mundial FIFA 2026 · Junio - Julio
         </div>
 
-        <h1 style={{ fontFamily: 'Bebas Neue', fontSize: 'clamp(3rem, 10vw, 7rem)', lineHeight: 1, marginBottom: '1.5rem' }}>
-          EL FANTASY<br />
-          <span style={{ color: G }}>DEL MUNDIAL</span><br />
-          QUE ESTABAS<br />ESPERANDO
+        <h1 className="fade-in-2" style={{ fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: 'clamp(3.5rem, 12vw, 8rem)', lineHeight: 0.95, marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+          El Fantasy<br />
+          <span style={{ color: G }}>del Mundial</span><br />
+          que estabas<br />
+          <span style={{ color: R }}>esperando</span>
         </h1>
 
-        <p style={{ color: '#6B6B7E', fontSize: '1.1rem', maxWidth: '520px', marginBottom: '2.5rem', lineHeight: 1.7 }}>
+        <p className="fade-in-3" style={{ color: '#666', fontSize: '1.05rem', maxWidth: '500px', marginBottom: '2.5rem', lineHeight: 1.7, fontFamily: 'Barlow' }}>
           Arma tu equipo, competi con amigos en ligas privadas y deja que la IA te diga quien va a brillar en USA, Mexico y Canada.
         </p>
 
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-          <Link to="/register" style={{ padding: '0.85rem 2rem', background: G, borderRadius: '10px', color: '#000', fontWeight: 700, fontSize: '1rem' }}>
+        <div className="fade-in-4" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '5rem' }}>
+          <Link to="/register" className="btn-primary"
+            style={{ padding: '0.9rem 2.25rem', background: G, borderRadius: '6px', color: '#000', fontFamily: 'Barlow Condensed', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '0.05em', textTransform: 'uppercase', display: 'inline-block' }}>
             Crear cuenta gratis
           </Link>
-          <Link to="/login" style={{ padding: '0.85rem 2rem', border: '1px solid #2A2A38', borderRadius: '10px', color: '#F4F4F6', fontSize: '1rem' }}>
+          <Link to="/login" className="btn-outline"
+            style={{ padding: '0.9rem 2.25rem', border: '1px solid #2A2A2A', borderRadius: '6px', color: '#F0F0F0', fontFamily: 'Barlow Condensed', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '0.05em', textTransform: 'uppercase', display: 'inline-block' }}>
             Ya tengo cuenta
           </Link>
         </div>
 
-        {/* FEATURES */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '5rem', maxWidth: '900px', width: '100%' }}>
+        {/* Features */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1px', maxWidth: '900px', width: '100%', background: '#1E1E1E', borderRadius: '10px', overflow: 'hidden', border: '1px solid #1E1E1E' }}>
           {[
-            { color: B, label: 'IA Predictiva', desc: 'El modelo ML estima el score de cada jugador antes del partido' },
-            { color: R, label: 'Ligas Privadas', desc: 'Invita amigos con un codigo, haz el draft y competi partido a partido' },
-            { color: G, label: 'Puntos en Vivo', desc: 'Actualizaciones en tiempo real mientras se juegan los partidos del Mundial' },
-            { color: GR, label: 'Estadisticas', desc: 'Dashboard completo con rendimiento de tu equipo y comparativas' },
+            { color: B, label: 'IA Predictiva', desc: 'Score esperado por jugador antes de cada partido' },
+            { color: R, label: 'Ligas Privadas', desc: 'Draft, codigo de invitacion y tabla en tiempo real' },
+            { color: G, label: 'Puntos en Vivo', desc: 'Actualizaciones mientras se juegan los partidos' },
+            { color: GR, label: '48 Selecciones', desc: 'Todos los clasificados al Mundial con plantel real' },
           ].map(f => (
-            <div key={f.label} style={{ background: '#111118', border: '1px solid #2A2A38', borderRadius: '12px', padding: '1.5rem', textAlign: 'left', borderTop: `3px solid ${f.color}` }}>
-              <div style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '1rem' }}>{f.label}</div>
-              <div style={{ color: '#6B6B7E', fontSize: '0.85rem', lineHeight: 1.6 }}>{f.desc}</div>
+            <div key={f.label} className="card-hover" style={{ background: '#0A0A0A', padding: '1.5rem', borderTop: `3px solid ${f.color}`, cursor: 'default' }}>
+              <div style={{ fontFamily: 'Barlow Condensed', fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{f.label}</div>
+              <div style={{ color: '#666', fontSize: '0.85rem', lineHeight: 1.6 }}>{f.desc}</div>
             </div>
           ))}
         </div>
       </main>
 
-      {/* Barra tricolor bottom */}
       <div style={{ height: '3px', background: `linear-gradient(to right, ${GR} 33%, ${G} 33%, ${G} 66%, ${R} 66%)` }} />
-      <footer style={{ textAlign: 'center', padding: '1.25rem', color: '#3A3A4E', fontSize: '0.8rem', borderTop: '1px solid #2A2A38' }}>
+      <footer style={{ textAlign: 'center', padding: '1.25rem', color: '#333', fontSize: '0.78rem', borderTop: '1px solid #1E1E1E', fontFamily: 'Barlow' }}>
         WorldFantasy 2026 · Proyecto portfolio de Thomas Rivero
       </footer>
     </div>
