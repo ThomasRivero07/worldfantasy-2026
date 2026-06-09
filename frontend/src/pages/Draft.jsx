@@ -228,7 +228,7 @@ export default function Draft() {
               ? <div style={{ textAlign: 'center', padding: '0.75rem', background: '#1A160A', border: `1px solid ${G}44`, borderRadius: '8px', color: G, fontSize: '0.875rem' }}>Equipo guardado correctamente</div>
               : <button onClick={async () => {
                   setSaving(true);
-                  try { console.log('Jugadores:', team.length, team.map(p => p.position)); await api.post('/teams/draft', { league_id: selectedLeague, players: team.map(p => ({ player_id: p.id, position: p.position })) }); setSaved(true); }
+                  try { console.log('Jugadores:', team.length, 'Liga:', selectedLeague, 'Players:', team.map(p => ({ id: p.id, pos: p.position }))); await api.post('/teams/draft', { league_id: selectedLeague, players: team.map(p => ({ player_id: p.id, position: p.position })) }); setSaved(true); }
                   catch (err) { alert(err.response?.data?.error || 'Error al guardar'); }
                   setSaving(false);
                 }} disabled={saving}
