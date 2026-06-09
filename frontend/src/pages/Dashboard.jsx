@@ -5,17 +5,29 @@ import Leagues from './Leagues.jsx';
 import Players from './Players.jsx';
 import Draft from './Draft.jsx';
 import Matches from './Matches.jsx';
+import MyTeam from './MyTeam.jsx';
+import Transfers from './Transfers.jsx';
 
 const G = '#C9A84C';
 const R = '#E61D25';
 const B = '#2A5298';
 
 const NAV_ITEMS = [
-  { key: 'home',    label: 'Inicio' },
-  { key: 'leagues', label: 'Ligas' },
-  { key: 'players', label: 'Jugadores' },
-  { key: 'draft',   label: 'Draft' },
-  { key: 'matches', label: 'Partidos' },
+  { key: 'home',      label: 'Inicio' },
+  { key: 'leagues',   label: 'Ligas' },
+  { key: 'myteam',    label: 'Mi Equipo' },
+  { key: 'transfers', label: 'Fichajes' },
+  { key: 'players',   label: 'Jugadores' },
+  { key: 'draft',     label: 'Draft' },
+  { key: 'matches',   label: 'Partidos' },
+];
+
+const MOBILE_NAV = [
+  { key: 'home',      label: 'Inicio',   icon: '⌂' },
+  { key: 'myteam',    label: 'Equipo',   icon: '◉' },
+  { key: 'draft',     label: 'Draft',    icon: '✦' },
+  { key: 'transfers', label: 'Fichajes', icon: '⇄' },
+  { key: 'matches',   label: 'Partidos', icon: '▶' },
 ];
 
 const useIsMobile = () => {
@@ -38,7 +50,7 @@ export default function Dashboard() {
   return (
     <div style={{ minHeight: '100vh', background: '#000', display: 'flex' }}>
 
-      {/* SIDEBAR — solo desktop */}
+      {/* SIDEBAR desktop */}
       {!isMobile && (
         <>
           <div style={{ width: '3px', background: `linear-gradient(to bottom, ${R} 33%, ${G} 33%, ${G} 66%, #3CAC3B 66%)`, flexShrink: 0 }} />
@@ -85,37 +97,36 @@ export default function Dashboard() {
 
       {/* MAIN */}
       <main style={{ flex: 1, padding: '1.5rem', overflowY: 'auto', paddingBottom: isMobile ? '70px' : '1.5rem' }}>
-
-        {/* Header mobile */}
         {isMobile && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
             <span style={{ fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '1.2rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
               <span style={{ color: G }}>WORLD</span><span style={{ color: '#F0F0F0' }}>FANTASY</span>
               <span style={{ color: R, marginLeft: '6px' }}>2026</span>
             </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '0.85rem' }}>
                 {user?.username?.[0]?.toUpperCase()}
               </div>
-              <button onClick={handleLogout}
-                style={{ padding: '4px 10px', background: 'transparent', border: '1px solid #1E1E1E', borderRadius: '6px', color: '#666', fontSize: '0.7rem', fontFamily: 'Barlow Condensed', fontWeight: 600, textTransform: 'uppercase', cursor: 'pointer' }}>
+              <button onClick={handleLogout} style={{ padding: '4px 10px', background: 'transparent', border: '1px solid #1E1E1E', borderRadius: '6px', color: '#666', fontSize: '0.7rem', fontFamily: 'Barlow Condensed', fontWeight: 600, textTransform: 'uppercase', cursor: 'pointer' }}>
                 Salir
               </button>
             </div>
           </div>
         )}
 
-        {active === 'home'    && <HomeTab user={user} setActive={setActive} isMobile={isMobile} />}
-        {active === 'leagues' && <Leagues />}
-        {active === 'players' && <Players />}
-        {active === 'draft'   && <Draft />}
-        {active === 'matches' && <Matches />}
+        {active === 'home'      && <HomeTab user={user} setActive={setActive} isMobile={isMobile} />}
+        {active === 'leagues'   && <Leagues />}
+        {active === 'myteam'    && <MyTeam />}
+        {active === 'transfers' && <Transfers />}
+        {active === 'players'   && <Players />}
+        {active === 'draft'     && <Draft />}
+        {active === 'matches'   && <Matches />}
       </main>
 
-      {/* BOTTOM NAV — solo mobile */}
+      {/* BOTTOM NAV mobile */}
       {isMobile && (
         <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#0A0A0A', borderTop: '1px solid #1E1E1E', display: 'flex', zIndex: 100 }}>
-          {NAV_ITEMS.map(item => (
+          {MOBILE_NAV.map(item => (
             <button key={item.key} onClick={() => setActive(item.key)}
               style={{ flex: 1, padding: '0.6rem 0.25rem', background: 'transparent', border: 'none',
                 color: active === item.key ? G : '#555',
@@ -123,9 +134,7 @@ export default function Dashboard() {
                 cursor: 'pointer', fontSize: '0.55rem', fontFamily: 'Barlow Condensed', fontWeight: 700,
                 letterSpacing: '0.05em', textTransform: 'uppercase', display: 'flex', flexDirection: 'column',
                 alignItems: 'center', gap: '3px', transition: 'color 0.15s' }}>
-              <span style={{ fontSize: '1.15rem' }}>
-                {item.key === 'home' ? '⌂' : item.key === 'leagues' ? '⊕' : item.key === 'players' ? '◉' : item.key === 'draft' ? '✦' : '▶'}
-              </span>
+              <span style={{ fontSize: '1.15rem' }}>{item.icon}</span>
               {item.label}
             </button>
           ))}
@@ -160,13 +169,13 @@ function HomeTab({ user, setActive, isMobile }) {
         ))}
       </div>
 
-      <h2 style={{ fontFamily: 'Barlow Condensed', fontWeight: 800, fontSize: '1rem', marginBottom: '0.75rem', color: '#444', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Proximos pasos</h2>
+      <h2 style={{ fontFamily: 'Barlow Condensed', fontWeight: 800, fontSize: '1rem', marginBottom: '0.75rem', color: '#444', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Accesos rapidos</h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.5rem' }}>
         {[
-          { label: 'Crear una liga', desc: 'Invita amigos y competi durante el Mundial', action: 'leagues', color: R },
-          { label: 'Ver jugadores', desc: 'Analiza el plantel de las 48 selecciones', action: 'players', color: B },
-          { label: 'Hacer el draft', desc: 'Arma tu equipo de 11 con $100M', action: 'draft', color: G },
-          { label: 'Ver partidos', desc: 'Fixture con predicciones ML', action: 'matches', color: '#3CAC3B' },
+          { label: 'Mi Equipo', desc: 'Ver puntos, elegir capitan y seguir tu rendimiento', action: 'myteam', color: G },
+          { label: 'Fichajes', desc: 'Cambia jugadores entre jornadas del Mundial', action: 'transfers', color: R },
+          { label: 'Mis Ligas', desc: 'Tabla de posiciones y codigo de invitacion', action: 'leagues', color: B },
+          { label: 'Partidos', desc: 'Fixture completo con predicciones ML', action: 'matches', color: '#3CAC3B' },
         ].map(item => (
           <div key={item.label} className="card-hover" style={{ background: '#0A0A0A', border: '1px solid #1E1E1E', borderRadius: '10px', padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderLeft: `3px solid ${item.color}` }}>
             <div style={{ flex: 1 }}>

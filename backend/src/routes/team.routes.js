@@ -8,7 +8,7 @@ router.use(protect);
 router.post('/draft', async (req, res) => {
   try {
     const { league_id, players } = req.body;
-    if (!league_id || !players || players.length !== 11)
+    if (!league_id || !players || players.length < 11)
       return res.status(400).json({ error: 'Necesitás exactamente 11 jugadores' });
 
     const team = await FantasyTeam.findOne({ where: { user_id: req.userId, league_id } });
