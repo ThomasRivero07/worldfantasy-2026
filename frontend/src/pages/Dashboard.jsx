@@ -7,10 +7,12 @@ import Draft from './Draft.jsx';
 import Matches from './Matches.jsx';
 import MyTeam from './MyTeam.jsx';
 import Transfers from './Transfers.jsx';
+import Admin from './Admin.jsx';
 
 const G = '#C9A84C';
 const R = '#E61D25';
 const B = '#2A5298';
+
 
 const NAV_ITEMS = [
   { key: 'home',      label: 'Inicio' },
@@ -20,6 +22,7 @@ const NAV_ITEMS = [
   { key: 'players',   label: 'Jugadores' },
   { key: 'draft',     label: 'Draft' },
   { key: 'matches',   label: 'Partidos' },
+  { key: 'admin',     label: 'Admin', adminOnly: true },
 ];
 
 const MOBILE_NAV = [
@@ -46,11 +49,11 @@ export default function Dashboard() {
   const [active, setActive] = useState('home');
   const isMobile = useIsMobile();
   const handleLogout = () => { logout(); navigate('/'); };
+  const isAdmin = user?.is_admin === true;
 
   return (
     <div style={{ minHeight: '100vh', background: '#000', display: 'flex' }}>
 
-      {/* SIDEBAR desktop */}
       {!isMobile && (
         <>
           <div style={{ width: '3px', background: `linear-gradient(to bottom, ${R} 33%, ${G} 33%, ${G} 66%, #3CAC3B 66%)`, flexShrink: 0 }} />
@@ -63,15 +66,16 @@ export default function Dashboard() {
             </div>
 
             <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', padding: '0 0.75rem' }}>
-              {NAV_ITEMS.map(item => (
+              {NAV_ITEMS.filter(item => !item.adminOnly || isAdmin).map(item => (
                 <button key={item.key} onClick={() => setActive(item.key)}
-                  style={{ display: 'flex', alignItems: 'center', padding: '0.65rem 0.85rem', borderRadius: '6px', border: 'none',
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0.65rem 0.85rem', borderRadius: '6px', border: 'none',
                     background: active === item.key ? '#111' : 'transparent',
-                    color: active === item.key ? G : '#666',
-                    borderLeft: active === item.key ? `3px solid ${G}` : '3px solid transparent',
+                    color: active === item.key ? (item.adminOnly ? R : G) : '#666',
+                    borderLeft: active === item.key ? `3px solid ${item.adminOnly ? R : G}` : '3px solid transparent',
                     cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Barlow Condensed', fontWeight: active === item.key ? 700 : 500,
                     letterSpacing: '0.05em', textTransform: 'uppercase', textAlign: 'left', transition: 'all 0.15s' }}>
                   {item.label}
+                  {item.adminOnly && <span style={{ fontSize: '0.55rem', background: R, color: '#fff', padding: '1px 5px', borderRadius: '3px', marginLeft: 'auto' }}>ADMIN</span>}
                 </button>
               ))}
             </nav>
@@ -95,7 +99,6 @@ export default function Dashboard() {
         </>
       )}
 
-      {/* MAIN */}
       <main style={{ flex: 1, padding: '1.5rem', overflowY: 'auto', paddingBottom: isMobile ? '70px' : '1.5rem' }}>
         {isMobile && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
@@ -114,16 +117,16 @@ export default function Dashboard() {
           </div>
         )}
 
-        {active === 'home'      && <HomeTab user={user} setActive={setActive} isMobile={isMobile} />}
+        {active === 'home'      && <HomeTab user={user} setActive={setActive} />}
         {active === 'leagues'   && <Leagues />}
         {active === 'myteam'    && <MyTeam />}
         {active === 'transfers' && <Transfers />}
         {active === 'players'   && <Players />}
         {active === 'draft'     && <Draft />}
         {active === 'matches'   && <Matches />}
+        {active === 'admin'     && <Admin />}
       </main>
 
-      {/* BOTTOM NAV mobile */}
       {isMobile && (
         <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#0A0A0A', borderTop: '1px solid #1E1E1E', display: 'flex', zIndex: 100 }}>
           {MOBILE_NAV.map(item => (
@@ -144,7 +147,7 @@ export default function Dashboard() {
   );
 }
 
-function HomeTab({ user, setActive, isMobile }) {
+function HomeTab({ user, setActive }) {
   const stats = [
     { label: 'Puntos', value: '0', color: G },
     { label: 'Ligas', value: '0', color: B },

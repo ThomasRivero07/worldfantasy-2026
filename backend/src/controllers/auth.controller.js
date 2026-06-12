@@ -6,6 +6,9 @@ import User from '../models/User.model.js';
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET || 'wf2026_secret_dev', { expiresIn: '7d' });
 
+const isAdmin = (username) =>
+  username === (process.env.ADMIN_USERNAME || '');
+
 export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -26,7 +29,7 @@ export const register = async (req, res) => {
     const token = generateToken(user.id);
     res.status(201).json({
       token,
-      user: { id: user.id, username: user.username, email: user.email, avatar_url: user.avatar_url }
+      user: { id: user.id, username: user.username, email: user.email, avatar_url: user.avatar_url, is_admin: isAdmin(user.username) }
     });
   } catch (err) {
     console.error('Register error:', err);
@@ -49,7 +52,7 @@ export const login = async (req, res) => {
     const token = generateToken(user.id);
     res.json({
       token,
-      user: { id: user.id, username: user.username, email: user.email, avatar_url: user.avatar_url, total_points: user.total_points }
+      user: { id: user.id, username: user.username, email: user.email, avatar_url: user.avatar_url, total_points: user.total_points, is_admin: isAdmin(user.username) }
     });
   } catch (err) {
     console.error('Login error:', err);
@@ -63,7 +66,7 @@ export const me = async (req, res) => {
       attributes: { exclude: ['password_hash'] }
     });
     if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
-    res.json({ user });
+    res.json({ user: { ...user.toJSON(), is_admin: isAdmin(user.username) } });
   } catch (err) {
     res.status(500).json({ error: 'Error del servidor' });
   }
