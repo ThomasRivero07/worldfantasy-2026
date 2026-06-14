@@ -8,11 +8,11 @@ import Matches from './Matches.jsx';
 import MyTeam from './MyTeam.jsx';
 import Transfers from './Transfers.jsx';
 import Admin from './Admin.jsx';
+import Profile from './Profile.jsx';
 
 const G = '#C9A84C';
 const R = '#E61D25';
 const B = '#2A5298';
-
 
 const NAV_ITEMS = [
   { key: 'home',      label: 'Inicio' },
@@ -81,15 +81,16 @@ export default function Dashboard() {
             </nav>
 
             <div style={{ padding: '1rem', borderTop: '1px solid #1E1E1E', marginTop: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '1rem' }}>
+              <button onClick={() => setActive('profile')}
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem', width: '100%', background: active === 'profile' ? '#111' : 'transparent', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer', transition: 'background 0.15s' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '1rem', flexShrink: 0 }}>
                   {user?.username?.[0]?.toUpperCase()}
                 </div>
-                <div>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 600, fontFamily: 'Barlow Condensed' }}>{user?.username}</div>
-                  <div style={{ fontSize: '0.72rem', color: '#666' }}>0 pts</div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 600, fontFamily: 'Barlow Condensed', color: active === 'profile' ? G : '#F0F0F0' }}>{user?.username}</div>
+                  <div style={{ fontSize: '0.7rem', color: '#666' }}>Ver perfil</div>
                 </div>
-              </div>
+              </button>
               <button onClick={handleLogout}
                 style={{ width: '100%', padding: '0.5rem', background: 'transparent', border: '1px solid #1E1E1E', borderRadius: '6px', color: '#666', fontSize: '0.78rem', fontFamily: 'Barlow Condensed', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', cursor: 'pointer' }}>
                 Cerrar sesion
@@ -107,9 +108,9 @@ export default function Dashboard() {
               <span style={{ color: R, marginLeft: '6px' }}>2026</span>
             </span>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '0.85rem' }}>
+              <button onClick={() => setActive('profile')} style={{ width: '30px', height: '30px', borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '0.85rem', border: 'none', cursor: 'pointer' }}>
                 {user?.username?.[0]?.toUpperCase()}
-              </div>
+              </button>
               <button onClick={handleLogout} style={{ padding: '4px 10px', background: 'transparent', border: '1px solid #1E1E1E', borderRadius: '6px', color: '#666', fontSize: '0.7rem', fontFamily: 'Barlow Condensed', fontWeight: 600, textTransform: 'uppercase', cursor: 'pointer' }}>
                 Salir
               </button>
@@ -125,6 +126,7 @@ export default function Dashboard() {
         {active === 'draft'     && <Draft />}
         {active === 'matches'   && <Matches />}
         {active === 'admin'     && <Admin />}
+        {active === 'profile'   && <Profile />}
       </main>
 
       {isMobile && (
