@@ -5,6 +5,8 @@ import FantasyTeam from '../models/FantasyTeam.model.js';
 import PointsLog from '../models/PointsLog.model.js';
 import Match from '../models/Match.model.js';
 import { calculatePlayerPoints } from '../services/scoring.service.js';
+import { io } from '../server.js';
+import { emitPointsUpdate, emitMatchFinished } from '../sockets/index.js';
 
 export const submitMatchStats = async (req, res) => {
   try {
@@ -23,7 +25,7 @@ export const submitMatchStats = async (req, res) => {
       const { points, breakdown } = calculatePlayerPoints(stat, player.position);
 
       await PlayerStats.destroy({ where: { player_id: stat.player_id, match_id } });
-      await PlayerStats.create({ id: uuidv4(), ...stat, fantasy_points: points, breakdown });
+      await PlayerStats.create({ id: uuidv4(), ...stat, match_id, fantasy_points: points, breakdown });
 
       await Player.increment({
         goals:          stat.goals || 0,
@@ -40,6 +42,9 @@ export const submitMatchStats = async (req, res) => {
     // Calcular puntos para todos los fantasy teams
     const playerIds = player_stats.map(s => s.player_id);
     const allTeams = await FantasyTeam.findAll();
+
+    // Agrupar equipos por liga para emitir eventos
+    const leagueUpdates = {};
 
     for (const team of allTeams) {
       const teamPlayers = team.players || [];
@@ -64,7 +69,27 @@ export const submitMatchStats = async (req, res) => {
         });
       }
 
-      if (teamPoints > 0) await team.increment({ total_points: teamPoints });
+      if (teamPoints > 0) {
+        await team.increment({ total_points: teamPoints });
+
+        // Acumular para el evento por liga
+        if (!leagueUpdates[team.league_id]) leagueUpdates[team.league_id] = [];
+        leagueUpdates[team.league_id].push({
+          team_id: team.id,
+          team_name: team.name,
+          points_gained: teamPoints,
+          new_total: team.total_points + teamPoints,
+        });
+      }
+    }
+
+    // Emitir eventos WebSocket
+    // 1. Evento global: partido terminado
+    emitMatchFinished(io, match_id, results);
+
+    // 2. Evento por liga: puntos actualizados
+    for (const [leagueId, updates] of Object.entries(leagueUpdates)) {
+      emitPointsUpdate(io, leagueId, { match_id, updates });
     }
 
     res.json({ message: 'Stats cargadas correctamente', results });
@@ -91,7 +116,7 @@ export const getTeamPoints = async (req, res) => {
 
     const enriched = await Promise.all(
       Object.entries(byPlayer).map(async ([player_id, data]) => {
-        const player = await Player.findByPk(player_id, { attributes: ['name', 'position', 'team_name'] });
+        const player = await Player.findByPk(player_id, { attributes: ['id', 'name', 'position', 'team_name'] });
         return { player, ...data };
       })
     );

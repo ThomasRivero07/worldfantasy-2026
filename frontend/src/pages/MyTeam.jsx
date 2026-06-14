@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api.js';
+import { useSocket } from '../hooks/useSocket.js';
 
 const G = '#C9A84C';
 const R = '#E61D25';
@@ -18,18 +19,38 @@ export default function MyTeam() {
   const [loading, setLoading] = useState(false);
   const [captainSaving, setCaptainSaving] = useState(false);
   const [success, setSuccess] = useState('');
+  const [liveUpdate, setLiveUpdate] = useState(null);
+
+  const { joinLeague, leaveLeague, onPointsUpdate, onMatchFinished } = useSocket();
 
   useEffect(() => { fetchLeagues(); }, []);
-  useEffect(() => { if (selectedLeague) fetchTeam(); }, [selectedLeague]);
+
+  useEffect(() => {
+  if (selectedLeague) {
+    fetchTeam();
+    joinLeague(selectedLeague);
+  }
+  return () => { if (selectedLeague) leaveLeague(selectedLeague); };
+}, [selectedLeague]);
+
+  // Escuchar actualizaciones en vivo
+  useEffect(() => {
+    const cleanup = onPointsUpdate((data) => {
+      setLiveUpdate(`Partido ${data.match_id} terminado. Puntos actualizados!`);
+      fetchTeam(); // recargar puntos
+      setTimeout(() => setLiveUpdate(null), 5000);
+    });
+    return cleanup;
+  }, [onPointsUpdate]);
 
   const fetchLeagues = async () => {
-    try {
-      const res = await api.get('/leagues/my');
-      setLeagues(res.data.leagues || []);
-      if (res.data.leagues?.length > 0) setSelectedLeague(res.data.leagues[0].id);
-    } catch {}
-  };
-
+  try {
+    const res = await api.get('/leagues/my');
+    setLeagues(res.data.leagues || []);
+    if (res.data.leagues?.length > 0) setSelectedLeague(res.data.leagues[0].id);
+  } catch {}
+};
+  
   const fetchTeam = async () => {
     setLoading(true);
     try {
@@ -38,21 +59,17 @@ export default function MyTeam() {
       if (!myTeam) { setTeam(null); setLoading(false); return; }
       setTeam(myTeam);
 
-      // Obtener info de jugadores
       if (myTeam.players?.length > 0) {
         const playersRes = await api.get('/players');
         const allPlayers = playersRes.data.players || [];
         const teamPlayerIds = myTeam.players.map(p => p.player_id);
-        const myPlayers = allPlayers.filter(p => teamPlayerIds.includes(p.id));
-        setPlayers(myPlayers);
+        setPlayers(allPlayers.filter(p => teamPlayerIds.includes(p.id)));
       }
 
-      // Obtener puntos
       try {
         const ptsRes = await api.get(`/stats/team/${myTeam.id}`);
         setPointsData(ptsRes.data);
       } catch {}
-
     } catch {}
     setLoading(false);
   };
@@ -89,7 +106,13 @@ export default function MyTeam() {
         <p style={{ color: '#666', fontSize: '0.875rem' }}>Gestioná tu equipo, elegí el capitan y seguí tus puntos</p>
       </div>
 
-      {/* Selector de liga */}
+      {/* Live update notification */}
+      {liveUpdate && (
+        <div style={{ background: '#1A1000', border: `1px solid ${G}`, borderRadius: '8px', padding: '0.75rem 1rem', marginBottom: '1rem', color: G, fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.8rem' }}>⚡</span> {liveUpdate}
+        </div>
+      )}
+
       {leagues.length > 1 && (
         <select value={selectedLeague} onChange={e => setSelectedLeague(e.target.value)}
           style={{ background: '#0A0A0A', border: '1px solid #1E1E1E', borderRadius: '8px', padding: '0.6rem 1rem', color: '#F0F0F0', fontSize: '0.875rem', outline: 'none', marginBottom: '1.5rem', cursor: 'pointer' }}>
@@ -111,15 +134,13 @@ export default function MyTeam() {
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: '1.5rem' }}>
-
-          {/* Jugadores */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <h2 style={{ fontFamily: 'Barlow Condensed', fontWeight: 700, fontSize: '1.1rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Plantel — {players.length}/11 jugadores
               </h2>
               <span style={{ fontFamily: 'Barlow Condensed', fontSize: '0.85rem', color: '#666' }}>
-                Presupuesto restante: <span style={{ color: G }}>${Number(team.budget_remaining).toFixed(1)}M</span>
+                Presupuesto: <span style={{ color: G }}>${Number(team.budget_remaining).toFixed(1)}M</span>
               </span>
             </div>
 
@@ -142,7 +163,7 @@ export default function MyTeam() {
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <span style={{ fontWeight: 600, fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player.name}</span>
-                            {isCaptain && <span style={{ background: G, color: '#000', fontSize: '0.6rem', padding: '1px 6px', borderRadius: '3px', fontFamily: 'Barlow Condensed', fontWeight: 800, letterSpacing: '0.05em', flexShrink: 0 }}>CAP x2</span>}
+                            {isCaptain && <span style={{ background: G, color: '#000', fontSize: '0.6rem', padding: '1px 6px', borderRadius: '3px', fontFamily: 'Barlow Condensed', fontWeight: 800, flexShrink: 0 }}>CAP x2</span>}
                           </div>
                           <div style={{ color: '#666', fontSize: '0.72rem' }}>{player.team_name}</div>
                         </div>
@@ -162,22 +183,19 @@ export default function MyTeam() {
             })}
           </div>
 
-          {/* Panel derecho: resumen */}
+          {/* Panel derecho */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {/* Puntos totales */}
             <div style={{ background: '#0A0A0A', border: '1px solid #1E1E1E', borderRadius: '12px', padding: '1.5rem', textAlign: 'center', borderTop: `3px solid ${G}` }}>
               <div style={{ color: '#666', fontSize: '0.75rem', fontFamily: 'Barlow Condensed', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '6px' }}>Puntos totales</div>
               <div style={{ fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '3.5rem', color: G, lineHeight: 1 }}>{team.total_points}</div>
               <div style={{ color: '#666', fontSize: '0.75rem', marginTop: '6px' }}>pts acumulados</div>
             </div>
 
-            {/* Nombre del equipo */}
             <div style={{ background: '#0A0A0A', border: '1px solid #1E1E1E', borderRadius: '12px', padding: '1.25rem' }}>
               <div style={{ color: '#666', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Equipo</div>
               <div style={{ fontFamily: 'Barlow Condensed', fontWeight: 700, fontSize: '1.2rem' }}>{team.name}</div>
             </div>
 
-            {/* Sistema de puntuacion */}
             <div style={{ background: '#0A0A0A', border: '1px solid #1E1E1E', borderRadius: '12px', padding: '1.25rem' }}>
               <div style={{ color: '#666', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem', fontFamily: 'Barlow Condensed', fontWeight: 700 }}>Sistema de puntuacion</div>
               {[
