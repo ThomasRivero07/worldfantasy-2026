@@ -9,6 +9,8 @@ import MyTeam from './MyTeam.jsx';
 import Transfers from './Transfers.jsx';
 import Admin from './Admin.jsx';
 import Profile from './Profile.jsx';
+import Bracket from './Bracket.jsx';
+import Groups from './Groups.jsx';
 
 const G = '#C9A84C';
 const R = '#E61D25';
@@ -22,6 +24,8 @@ const NAV_ITEMS = [
   { key: 'players',   label: 'Jugadores' },
   { key: 'draft',     label: 'Draft' },
   { key: 'matches',   label: 'Partidos' },
+  { key: 'bracket', label: 'Eliminatorias' },
+  { key: 'groups', label: 'Fase de Grupos' },
   { key: 'admin',     label: 'Admin', adminOnly: true },
 ];
 
@@ -58,41 +62,44 @@ export default function Dashboard() {
         <>
           <div style={{ width: '3px', background: `linear-gradient(to bottom, ${R} 33%, ${G} 33%, ${G} 66%, #3CAC3B 66%)`, flexShrink: 0 }} />
           <aside style={{ width: '220px', background: '#0A0A0A', borderRight: '1px solid #1E1E1E', display: 'flex', flexDirection: 'column', padding: '1.5rem 0', flexShrink: 0 }}>
+            {/* Logo con FIFA26 */}
             <div style={{ padding: '0 1.25rem', marginBottom: '2rem' }}>
-              <div style={{ fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '1.4rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              <div className="font-fifa" style={{ fontSize: '1.4rem', letterSpacing: '0.05em' }}>
                 <span style={{ color: G }}>WORLD</span><span style={{ color: '#F0F0F0' }}>FANTASY</span>
               </div>
-              <div style={{ color: R, fontSize: '0.72rem', fontFamily: 'Barlow Condensed', fontWeight: 700, letterSpacing: '0.15em' }}>2026</div>
+              <div className="font-fifa" style={{ color: R, fontSize: '0.85rem', letterSpacing: '0.15em' }}>2026</div>
             </div>
 
+            {/* Nav items con FIFA26 */}
             <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', padding: '0 0.75rem' }}>
               {NAV_ITEMS.filter(item => !item.adminOnly || isAdmin).map(item => (
                 <button key={item.key} onClick={() => setActive(item.key)}
+                  className="font-fifa"
                   style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0.65rem 0.85rem', borderRadius: '6px', border: 'none',
                     background: active === item.key ? '#111' : 'transparent',
                     color: active === item.key ? (item.adminOnly ? R : G) : '#666',
                     borderLeft: active === item.key ? `3px solid ${item.adminOnly ? R : G}` : '3px solid transparent',
-                    cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Barlow Condensed', fontWeight: active === item.key ? 700 : 500,
-                    letterSpacing: '0.05em', textTransform: 'uppercase', textAlign: 'left', transition: 'all 0.15s' }}>
+                    cursor: 'pointer', fontSize: '0.8rem', letterSpacing: '0.05em', textAlign: 'left', transition: 'all 0.15s' }}>
                   {item.label}
-                  {item.adminOnly && <span style={{ fontSize: '0.55rem', background: R, color: '#fff', padding: '1px 5px', borderRadius: '3px', marginLeft: 'auto' }}>ADMIN</span>}
+                  {item.adminOnly && <span style={{ fontSize: '0.55rem', background: R, color: '#fff', padding: '1px 5px', borderRadius: '3px', marginLeft: 'auto', fontFamily: 'Barlow Condensed' }}>ADMIN</span>}
                 </button>
               ))}
             </nav>
 
+            {/* Usuario con FIFA26 */}
             <div style={{ padding: '1rem', borderTop: '1px solid #1E1E1E', marginTop: '1rem' }}>
               <button onClick={() => setActive('profile')}
                 style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem', width: '100%', background: active === 'profile' ? '#111' : 'transparent', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer', transition: 'background 0.15s' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '1rem', flexShrink: 0 }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontFamily: 'FIFA26', fontWeight: 900, fontSize: '1rem', flexShrink: 0 }}>
                   {user?.username?.[0]?.toUpperCase()}
                 </div>
                 <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 600, fontFamily: 'Barlow Condensed', color: active === 'profile' ? G : '#F0F0F0' }}>{user?.username}</div>
-                  <div style={{ fontSize: '0.7rem', color: '#666' }}>Ver perfil</div>
+                  <div className="font-fifa" style={{ fontSize: '0.85rem', color: active === 'profile' ? G : '#F0F0F0' }}>{user?.username}</div>
+                  <div style={{ fontSize: '0.7rem', color: '#666', fontFamily: 'Barlow' }}>Ver perfil</div>
                 </div>
               </button>
-              <button onClick={handleLogout}
-                style={{ width: '100%', padding: '0.5rem', background: 'transparent', border: '1px solid #1E1E1E', borderRadius: '6px', color: '#666', fontSize: '0.78rem', fontFamily: 'Barlow Condensed', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', cursor: 'pointer' }}>
+              <button onClick={handleLogout} className="font-fifa"
+                style={{ width: '100%', padding: '0.5rem', background: 'transparent', border: '1px solid #1E1E1E', borderRadius: '6px', color: '#666', fontSize: '0.72rem', letterSpacing: '0.05em', cursor: 'pointer' }}>
                 Cerrar sesion
               </button>
             </div>
@@ -103,15 +110,15 @@ export default function Dashboard() {
       <main style={{ flex: 1, padding: '1.5rem', overflowY: 'auto', paddingBottom: isMobile ? '70px' : '1.5rem' }}>
         {isMobile && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-            <span style={{ fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '1.2rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+            <span className="font-fifa" style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>
               <span style={{ color: G }}>WORLD</span><span style={{ color: '#F0F0F0' }}>FANTASY</span>
               <span style={{ color: R, marginLeft: '6px' }}>2026</span>
             </span>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <button onClick={() => setActive('profile')} style={{ width: '30px', height: '30px', borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: '0.85rem', border: 'none', cursor: 'pointer' }}>
+              <button onClick={() => setActive('profile')} style={{ width: '30px', height: '30px', borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontFamily: 'FIFA26', fontWeight: 900, fontSize: '0.85rem', border: 'none', cursor: 'pointer' }}>
                 {user?.username?.[0]?.toUpperCase()}
               </button>
-              <button onClick={handleLogout} style={{ padding: '4px 10px', background: 'transparent', border: '1px solid #1E1E1E', borderRadius: '6px', color: '#666', fontSize: '0.7rem', fontFamily: 'Barlow Condensed', fontWeight: 600, textTransform: 'uppercase', cursor: 'pointer' }}>
+              <button onClick={handleLogout} className="font-fifa" style={{ padding: '4px 10px', background: 'transparent', border: '1px solid #1E1E1E', borderRadius: '6px', color: '#666', fontSize: '0.65rem', cursor: 'pointer' }}>
                 Salir
               </button>
             </div>
@@ -127,19 +134,21 @@ export default function Dashboard() {
         {active === 'matches'   && <Matches />}
         {active === 'admin'     && <Admin />}
         {active === 'profile'   && <Profile />}
+        {active === 'bracket' && <Bracket />}
+        {active === 'groups' && <Groups />}
       </main>
 
       {isMobile && (
         <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#0A0A0A', borderTop: '1px solid #1E1E1E', display: 'flex', zIndex: 100 }}>
           {MOBILE_NAV.map(item => (
             <button key={item.key} onClick={() => setActive(item.key)}
+              className="font-fifa"
               style={{ flex: 1, padding: '0.6rem 0.25rem', background: 'transparent', border: 'none',
                 color: active === item.key ? G : '#555',
                 borderTop: active === item.key ? `2px solid ${G}` : '2px solid transparent',
-                cursor: 'pointer', fontSize: '0.55rem', fontFamily: 'Barlow Condensed', fontWeight: 700,
-                letterSpacing: '0.05em', textTransform: 'uppercase', display: 'flex', flexDirection: 'column',
+                cursor: 'pointer', fontSize: '0.5rem', letterSpacing: '0.05em', display: 'flex', flexDirection: 'column',
                 alignItems: 'center', gap: '3px', transition: 'color 0.15s' }}>
-              <span style={{ fontSize: '1.15rem' }}>{item.icon}</span>
+              <span style={{ fontSize: '1.15rem', fontFamily: 'sans-serif' }}>{item.icon}</span>
               {item.label}
             </button>
           ))}
@@ -159,7 +168,7 @@ function HomeTab({ user, setActive }) {
   return (
     <div className="fade-in">
       <div style={{ marginBottom: '1.5rem' }}>
-        <h1 style={{ fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: 'clamp(1.5rem, 6vw, 2.5rem)', marginBottom: '4px', textTransform: 'uppercase' }}>
+        <h1 style={{ fontSize: 'clamp(1.5rem, 6vw, 2.5rem)', marginBottom: '4px' }}>
           Bienvenido, <span style={{ color: G }}>{user?.username}</span>
         </h1>
         <p style={{ color: '#666', fontSize: '0.875rem' }}>El Mundial arranca el 11 de junio.</p>
@@ -174,7 +183,7 @@ function HomeTab({ user, setActive }) {
         ))}
       </div>
 
-      <h2 style={{ fontFamily: 'Barlow Condensed', fontWeight: 800, fontSize: '1rem', marginBottom: '0.75rem', color: '#444', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Accesos rapidos</h2>
+      <h2 style={{ fontSize: '1rem', marginBottom: '0.75rem', color: '#444' }}>Accesos rapidos</h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.5rem' }}>
         {[
           { label: 'Mi Equipo', desc: 'Ver puntos, elegir capitan y seguir tu rendimiento', action: 'myteam', color: G },
